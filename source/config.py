@@ -1,6 +1,6 @@
 BASIS = 'sto-3g'
 VQE_MAXITER = 3000
-VQE_TOL = 1e-6
+VQE_TOL = 1e-12
 CHEMICAL_ACCURACY_CM = 349.755
 CHEM_ACC_COLOR = '#b00000'
 
@@ -20,3 +20,6 @@ SEEDS_DICT = {
     'beh2_interpolation':[5, 6, 8, 13, 37, 53, 60, 64, 72, 78],
     'beh2_extrapolation':[16, 20, 44, 49, 59, 71, 77, 78, 86, 93]
 }
+
+LEARNING_CURVE_SEEDS =[5, 7, 8, 13, 14, 15, 48, 60, 64, 78]
+TRAIN_SIZES =[5, 10, 15, 20, 25, 30, 50, 100, 300, 500, 1000, 5000]
