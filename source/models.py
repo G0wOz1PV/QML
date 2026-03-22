@@ -19,6 +19,7 @@ class VQEProxy:
         self.basis = basis
         self.mapper = JordanWignerMapper()
         self._ansatz_cache = {}
+        self._opt_cache = {}
 
     def _get_atom_string(self, r):
         if self.molecule_type == 'lih':
@@ -51,6 +52,10 @@ class VQEProxy:
         return ansatz, H_op
 
     def run_vqe_optimization(self, r: float, initial_point=None):
+        r_key = round(r, 4)
+        if r_key in self._opt_cache:
+            return self._opt_cache[r_key]
+
         ansatz, H_op = self.get_ansatz_and_ops(r)
 
         def cost(params):
@@ -63,6 +68,7 @@ class VQEProxy:
             initial_point = np.zeros(ansatz.num_parameters)
 
         res = minimize(cost, initial_point, method='L-BFGS-B', tol=VQE_TOL, options={'maxiter': VQE_MAXITER})
+        self._opt_cache[r_key] = res.x
         return res.x
 
     def get_state_vector(self, r: float, theta: np.ndarray):
@@ -271,7 +277,7 @@ class QuantumKernelFixedAnsatz:
         return Statevector(qc).data
 
     def __call__(self, X, Z, theta):
-        sx =[self._state(x, theta) for x in X]
+        sx = [self._state(x, theta) for x in X]
         sz = [self._state(z, theta) for z in Z]
         return np.abs(np.array(sx) @ np.array(sz).conj().T)**2
 
@@ -297,7 +303,7 @@ class QuantumKernelAnsatz:
         return Statevector(qc).data
 
     def __call__(self, X, Z, theta):
-        sx = [self._state(x, theta) for x in X]
+        sx =[self._state(x, theta) for x in X]
         sz =[self._state(z, theta) for z in Z]
         return np.abs(np.array(sx) @ np.array(sz).conj().T)**2
 
